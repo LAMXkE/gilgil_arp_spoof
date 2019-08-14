@@ -1,7 +1,5 @@
-#ifndef CHECKFUNC_H
-#define CHECKFUNC_H
+#pragma once
 #include "main.h"
-#endif // CHECKFUNC_H
 
 
 int checkSourceMac(const u_char* packet, uint8_t *MAC);

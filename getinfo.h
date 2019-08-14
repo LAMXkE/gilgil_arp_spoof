@@ -1,7 +1,5 @@
-#ifndef GETINFO_H
-#define GETINFO_H
+#pragma once
 #include "main.h"
-#endif // GETINFO_H
 
 
 void get_my_MAC(uint8_t *mac);
