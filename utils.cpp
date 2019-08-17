@@ -67,10 +67,13 @@ void makeARPpacket(uint8_t *packbuf, uint8_t *DestMAC, uint8_t *SourceMac, uint1
     memcpy(packbuf, &arp_packet, length);
 }
 
+
 void sendPacket(pcap_t *fp, uint8_t *packet, int length){
 
     if ((pcap_sendpacket(fp, packet, length)) != 0) {
-        fprintf(stderr, "Error sending packet: %s : %d\n", pcap_geterr(fp), length);
+        fprintf(stderr, "Error sending packet: %s / packet size : %d\n", pcap_geterr(fp), length);
     }
 
 }
+
+

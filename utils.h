@@ -17,3 +17,4 @@ void spoofHeader(uint8_t *packet, uint8_t *DestMac, uint8_t *SourceMac);
 void makeARPpacket(uint8_t *packbuf, uint8_t *DestMAC, uint8_t *SourceMac, uint16_t type, uint8_t *SenderMac, uint8_t *TargetMac, uint8_t *Senderip, uint8_t *Targetip);
 
 void sendPacket(pcap_t *fp, uint8_t *packet, int length);
+

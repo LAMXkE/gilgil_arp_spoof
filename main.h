@@ -1,6 +1,4 @@
-#ifndef MAIN_H
-#define MAIN_H
-
+#pragma once
 #include <QCoreApplication>
 #include <cstdlib>
 #include <stdint.h>
@@ -11,14 +9,13 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <unistd.h>
+#include <thread>
 
 #include "structs.h"
 #include "getinfo.h"
 #include "utils.h"
 
-
-#endif // MAIN_H
-
+using namespace std;
 
 
 

