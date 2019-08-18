@@ -44,9 +44,9 @@ void spoofHeader(uint8_t *packet, uint8_t *DestMac, uint8_t *SourceMac){
 void makeARPpacket(uint8_t *packbuf, uint8_t *DestMAC, uint8_t *SourceMac, uint16_t opcode, uint8_t *SenderMac, uint8_t *TargetMac, uint8_t *Senderip, uint8_t *Targetip){
     packet arp_packet;
     int length;
-    memcpy(arp_packet.eth.srcMac, SourceMac, 6);           //src : me
-    memcpy(arp_packet.eth.destMac, DestMAC, 6);//"\xFF\xFF\xFF\xFF\xFF\xFF",6);  //dest : broadcast
-    arp_packet.eth.type = htons(0x0806);	//arp
+    memcpy(arp_packet.eth.srcMac, SourceMac, 6);
+    memcpy(arp_packet.eth.destMac, DestMAC, 6);
+    arp_packet.eth.type = htons(0x0806);
 
     arp_packet.arp.hardware_type = htons(1);       // hardware_type 1 : Ethernet
     arp_packet.arp.protocol_type = htons(0x0800);  // protocol_type 0x0800 : IPv4
@@ -54,7 +54,7 @@ void makeARPpacket(uint8_t *packbuf, uint8_t *DestMAC, uint8_t *SourceMac, uint1
     arp_packet.arp.protocol_addr_len = 4;             // IP len =4
 
 
-    arp_packet.arp.operation=htons(opcode);             //opcode = 1: request
+    arp_packet.arp.operation=htons(opcode);
 
     memcpy(arp_packet.arp.Sender_Mac, SenderMac,6);
     memcpy(arp_packet.arp.Target_Mac, TargetMac,6);
