@@ -159,12 +159,6 @@ int main(int argc, char **argv) {
                                 spoofHeader(relay_packet, sessionlist[j]->senderMAC, myMAC);
                                 sendPacket(fp,relay_packet, header->caplen);
                                 break;
-                            //}
-                            //else if(checkSourceMac(recv_pack, sessionlist[j]->senderMAC)){
-                            //    memcpy(relay_packet, recv_pack, header->caplen);
-                            //    spoofHeader(relay_packet, sessionlist[j]->targetMAC, myMAC);
-                            //    sendPacket(fp,relay_packet, header->caplen);
-                            //    break;
                             }else{
                                 continue;
                             }
