@@ -176,6 +176,7 @@ int main(int argc, char **argv) {
         free(sessionlist[j]);
     }
     free(sessionlist);
+    pcap_close(fp);
     printf("Done");
     return 0;
 }
